@@ -53,11 +53,32 @@ def am(f,m):
  f="/".join(rs);ps=f.split();sd="b"if ps[1]=="w"else"w"
  return f+" "+sd
 def ch(f,l):
- bm=None;bs=float("-inf")
+ # depth-2 alpha-beta with move generation
+ best=None;bs=float("-inf")
  for m in l:
-  s=ev(am(f,m))
-  if s>bs:bs=s;bm=m
- return bm
+  f2=am(f,m)
+  # generate opponent replies from FEN
+  b=bd(f2)
+  # simple move gen: for each piece, try all 8 directions
+  replies=[]
+  for sq,pc in b.items():
+   fl=ord(sq[0])-97;rk=8-int(sq[1])
+   dirs=[(1,0),(-1,0),(0,1),(0,-1),(1,1),(1,-1),(-1,1),(-1,-1)]
+   if pc.lower()=="n":dirs=[(1,2),(2,1),(-1,2),(-2,1),(1,-2),(2,-1),(-1,-2),(-2,-1)]
+   for df,dr in dirs:
+    nf=fl+df;nr=rk+dr
+    if 0<=nf<8 and 0<=nr<8:
+     ts="abcdefgh"[nf]+str(8-nr)
+     tp=b.get(ts)
+     if tp is None or tp.islower()!=pc.islower():
+      replies.append(sq+ts)
+  # evaluate worst case for us
+  worst=float("inf")
+  for r in replies:
+   f3=am(f2,r)
+   worst=min(worst,ev(f3))
+  if worst>bs:bs=worst;best=m
+ return best
 while 1:
  g=post("/game",{})
  if g["status"]=="done":break
