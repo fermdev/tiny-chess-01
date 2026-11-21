@@ -1,5 +1,5 @@
 # tiny-chess-01: alpha-beta, depth 3, material + PST.
-# Improved: better move ordering, quiescence search.
+# Final version: optimized move ordering, better evaluation.
 import json,os,sys,urllib.request as u,urllib.error as e
 E=os.environ.get("MAKEFUN_ENV_URL")or sys.exit("no env")
 V={"p":100,"n":320,"b":330,"r":500,"q":900,"k":20000}
